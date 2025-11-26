@@ -87,15 +87,15 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
   }
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
       {/* Backdrop */}
       <div 
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" 
+        className="absolute inset-0 bg-black/70 backdrop-blur-sm transition-opacity" 
         onClick={onClose}
       />
 
       {/* Modal Content */}
-      <div className="relative w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+      <div className="relative w-full max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200 my-auto">
         
         {/* Close Button */}
         <button 
