@@ -8,10 +8,10 @@ import { cn } from "@/lib/utils";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Bananas - AI Style Collection",
+  title: "Pumpbanana - AI Style Collection",
   description: "Discover and create amazing AI styles.",
   icons: {
-    icon: '/banana-logo.svg',
+    icon: '/bananas-icon.ico',
   },
 };
 

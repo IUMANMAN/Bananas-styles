@@ -1,4 +1,4 @@
-import { Twitter, Instagram } from 'lucide-react'
+import { Twitter, Instagram, Book } from 'lucide-react'
 import Link from 'next/link'
 
 export default function Footer() {
@@ -9,7 +9,7 @@ export default function Footer() {
           
           {/* Logo/Brand */}
           <div className="text-center">
-            <h3 className="text-xl font-black tracking-tighter">BANANAS</h3>
+            <h3 className="text-xl font-black tracking-tighter">PUMPBANANA</h3>
             <p className="text-gray-500 text-sm mt-2">
               Curated AI styles for your next generation.
             </p>
@@ -18,19 +18,21 @@ export default function Footer() {
           {/* Social Links */}
           <div className="flex items-center space-x-6">
             <a 
-              href="https://instagram.com" 
+              href="https://www.instagram.com/pumpbananas?igsh=OGQ5ZDc2ODk2ZA%3D%3D&utm_source=qr" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="p-3 bg-gray-50 rounded-full text-[#330066] hover:bg-[#330066] hover:text-white transition-all duration-300 hover:scale-110"
+              className="p-3 bg-gray-50 rounded-full text-gray-600 hover:bg-black hover:text-white transition-all duration-300 hover:scale-110"
+              aria-label="Instagram"
             >
               <Instagram className="w-5 h-5" />
             </a>
             
             <a 
-              href="https://tiktok.com" 
+              href="https://www.tiktok.com/@pumpbananas?_r=1&_t=ZT-920IkULmn78" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="p-3 bg-gray-50 rounded-full text-[#330066] hover:bg-[#330066] hover:text-white transition-all duration-300 hover:scale-110"
+              className="p-3 bg-gray-50 rounded-full text-gray-600 hover:bg-black hover:text-white transition-all duration-300 hover:scale-110"
+              aria-label="TikTok"
             >
               {/* TikTok Icon SVG */}
               <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
@@ -39,10 +41,11 @@ export default function Footer() {
             </a>
 
             <a 
-              href="https://twitter.com" 
+              href="https://x.com/my0steric?s=21" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="p-3 bg-gray-50 rounded-full text-[#330066] hover:bg-[#330066] hover:text-white transition-all duration-300 hover:scale-110"
+              className="p-3 bg-gray-50 rounded-full text-gray-600 hover:bg-black hover:text-white transition-all duration-300 hover:scale-110"
+              aria-label="X (Twitter)"
             >
               {/* X (Twitter) Icon SVG */}
               <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
@@ -51,19 +54,19 @@ export default function Footer() {
             </a>
 
             <a 
-              href="https://xiaohongshu.com" 
+              href="https://xhslink.com/m/A6MBRkqrmi7" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="p-3 bg-gray-50 rounded-full text-[#330066] hover:bg-[#330066] hover:text-white transition-all duration-300 hover:scale-110 group"
+              className="p-3 bg-gray-50 rounded-full text-gray-600 hover:bg-black hover:text-white transition-all duration-300 hover:scale-110 group"
+              aria-label="Little Red Book"
             >
-              {/* Xiaohongshu (RedNote) - Simple text representation or generic icon if specific SVG unavailable, using a stylized '红' or similar */}
-              <span className="text-xs font-bold group-hover:text-white">小红书</span>
+              <Book className="w-5 h-5" />
             </a>
           </div>
 
           {/* Copyright */}
           <div className="text-center text-gray-400 text-xs">
-            &copy; {new Date().getFullYear()} Bananas. All rights reserved.
+            &copy; {new Date().getFullYear()} PUMPBANANA. All rights reserved.
           </div>
         </div>
       </div>

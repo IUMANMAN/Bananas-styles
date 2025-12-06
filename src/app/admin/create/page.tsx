@@ -61,6 +61,15 @@ export default function CreateStylePage() {
           />
         </div>
 
+        <div>
+           <label className="block text-sm font-bold text-gray-700 mb-2">Source URL (Optional)</label>
+          <input 
+            name="source_url" 
+            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-[#330066] focus:ring-2 focus:ring-purple-100 outline-none transition-all"
+            placeholder="https://..."
+          />
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label className="block text-sm font-bold text-gray-700 mb-2">Generated Image</label>

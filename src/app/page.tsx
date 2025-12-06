@@ -44,7 +44,7 @@ export default async function Home() {
         </div>
         
         <p className="text-gray-600 text-base md:text-lg max-w-3xl mx-auto leading-relaxed">
-          Discover curated prompts for <span className="font-semibold text-orange-500">Bananas</span> image generation and editing. 
+          Discover curated prompts for <span className="font-semibold text-orange-500">PUMPBANANA</span> image generation and editing. 
           Transform your ideas into stunning visuals with our handpicked prompt library.
         </p>
         

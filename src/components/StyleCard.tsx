@@ -8,6 +8,17 @@ import { useState } from 'react'
 import { cn } from '@/lib/utils'
 import { createClient } from '@/lib/supabase/client'
 
+interface Style {
+  id: string
+  title: string
+  introduction?: string
+  prompt: string
+  generated_image_url: string
+  original_image_url?: string
+  source_url?: string
+  is_liked?: boolean
+}
+
 interface StyleCardProps {
   id: string
   title: string
@@ -91,12 +102,10 @@ export default function StyleCard({ id, title, imageUrl, originalImageUrl, intro
             {/* Original Image (Right side) */}
             {originalImageUrl && (
               <div className="relative w-1/2 aspect-[3/4] overflow-hidden bg-gray-100">
-                <Image
+                <img
                   src={originalImageUrl}
                   alt={`Original - ${displayTitle}`}
-                  fill
-                  className="object-cover transition-transform duration-700 group-hover:scale-105"
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                 />
                  <div className="absolute top-2 right-2 px-2 py-1 bg-black/40 backdrop-blur-md rounded-md text-[10px] font-bold text-white uppercase tracking-wider">
                   Ref
@@ -107,7 +116,7 @@ export default function StyleCard({ id, title, imageUrl, originalImageUrl, intro
           
           {/* Card Footer: Title and Actions - Clean White Background */}
           <div className="bg-white dark:bg-zinc-900 p-4 flex justify-between items-center gap-3">
-             <h3 className="font-bold text-[#330066] dark:text-purple-300 text-sm sm:text-base leading-tight line-clamp-2 flex-grow">
+             <h3 className="font-bold text-black dark:text-gray-200 text-sm sm:text-base leading-tight line-clamp-2 flex-grow">
               {displayTitle}
             </h3>
             

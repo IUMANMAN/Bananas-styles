@@ -89,6 +89,7 @@ export async function createStyle(formData: FormData) {
     const title = formData.get('title') as string
     const introduction = formData.get('introduction') as string
     const prompt = formData.get('prompt') as string
+    const source_url = formData.get('source_url') as string
 
     // File handling
     const generatedImageFile = formData.get('generated_image_file') as File
@@ -121,6 +122,7 @@ export async function createStyle(formData: FormData) {
             title,
             introduction,
             prompt,
+            source_url: source_url || null,
             generated_image_url,
             original_image_url: original_image_url || null
         })

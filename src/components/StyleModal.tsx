@@ -16,6 +16,7 @@ interface StyleModalProps {
     prompt: string
     imageUrl: string
     originalImageUrl?: string
+    source_url?: string
   }
 }
 
@@ -85,17 +86,20 @@ export default function StyleModal({ isOpen, onClose, style }: StyleModalProps) 
         </button>
 
         {/* Unified Scroll Container for Mobile - Split for Desktop */}
+        {/* Unified Scroll Container (Mobile: Vertical flow, Desktop: row) */}
          <div className="flex flex-col md:flex-row w-full h-full overflow-y-auto md:overflow-hidden">
         
           {/* Images Section (Left/Top) */}
-          <div className="w-full md:w-1/2 bg-gray-100 dark:bg-gray-900 flex flex-col shrink-0 md:h-full md:overflow-y-auto">
+          <div className="w-full md:w-1/2 bg-gray-100 dark:bg-gray-900 flex shrink-0 md:h-full md:overflow-y-auto flex-row overflow-x-auto md:flex-col snap-x snap-mandatory">
             {/* Generated Image */}
-            <div className="relative w-full min-h-[300px] md:min-h-0 md:flex-1 aspect-[3/4] md:aspect-auto">
-               <Image
+            <div className={cn(
+              "relative w-full md:w-full min-h-[300px] md:min-h-0 md:flex-1 shrink-0 snap-center bg-gray-900",
+              style.originalImageUrl ? "w-1/2" : "w-full"
+            )}>
+               <img
                 src={style.imageUrl}
                 alt={`Generated - ${style.title}`}
-                fill
-                className="object-contain md:object-cover bg-gray-900"
+                className="w-full h-full object-contain"
               />
               <div className="absolute top-4 left-4 px-3 py-1.5 bg-black/60 backdrop-blur-md rounded-lg text-xs font-semibold text-white uppercase tracking-wider shadow-sm z-20">
                 Generated
@@ -104,12 +108,11 @@ export default function StyleModal({ isOpen, onClose, style }: StyleModalProps) 
             
             {/* Original Image */}
             {style.originalImageUrl && (
-              <div className="relative w-full min-h-[300px] md:min-h-0 md:flex-1 border-t-4 border-white dark:border-gray-800 aspect-[3/4] md:aspect-auto">
-                <Image
+              <div className="relative w-1/2 md:w-full min-h-[300px] md:min-h-0 md:flex-1 border-l md:border-l-0 md:border-t-4 border-white dark:border-gray-800 shrink-0 snap-center bg-gray-900">
+                <img
                   src={style.originalImageUrl}
                   alt={`Original - ${style.title}`}
-                  fill
-                  className="object-contain md:object-cover bg-gray-900"
+                  className="w-full h-full object-contain"
                 />
                 <div className="absolute top-4 left-4 px-3 py-1.5 bg-blue-600/80 backdrop-blur-md rounded-lg text-xs font-semibold text-white uppercase tracking-wider shadow-sm z-20">
                   Original
@@ -121,18 +124,34 @@ export default function StyleModal({ isOpen, onClose, style }: StyleModalProps) 
           {/* Details Section (Right/Bottom) */}
           <div className="w-full md:w-1/2 flex flex-col bg-white dark:bg-black md:h-full md:overflow-hidden">
             <div className="p-6 md:p-8 md:overflow-y-auto flex-1 pb-24 md:pb-8">
-              <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-purple-300 mb-4">
+              <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4">
                 {style.title}
               </h2>
               
               {style.introduction && (
-                <div className="mb-8">
+                <div className="mb-6">
                   <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2">
                     Description
                   </h3>
                   <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
                     {style.introduction}
                   </p>
+                </div>
+              )}
+
+              {style.source_url && (
+                <div className="mb-8">
+                   <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2">
+                    Source
+                  </h3>
+                  <a 
+                    href={style.source_url} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-[#330066] dark:text-purple-300 hover:underline font-medium break-all"
+                  >
+                    {style.source_url}
+                  </a>
                 </div>
               )}
 

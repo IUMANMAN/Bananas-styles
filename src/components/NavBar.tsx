@@ -13,32 +13,34 @@ export default async function NavBar() {
   return (
     <nav className="absolute top-0 w-full z-50 bg-white/90 dark:bg-black/90 backdrop-blur-md border-b border-gray-100 dark:border-gray-800 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-center items-center h-20 relative">
+        <div className="flex items-center h-20 relative">
           
-          {/* Centered Logo & Title */}
-          <Link href="/" className="flex flex-col items-center group">
-            <div className="relative w-10 h-10 mb-1 transition-transform group-hover:scale-110 duration-300">
-               <img src="/banana-logo.png" alt="Banana Logo" className="w-full h-full object-contain" />
+          {/* Logo & Title - Left Aligned */}
+          {/* Logo & Title - Left Aligned */}
+          {/* Logo & Title - Left Aligned */}
+          <Link href="/" className="flex items-center gap-3 group">
+            <div className="relative w-12 h-12 md:w-16 md:h-16 shrink-0 bg-white rounded-full overflow-hidden transition-transform group-hover:scale-105 duration-300 flex items-center justify-center">
+               <img src="/banana-logo.jpeg" alt="Pumpbanana Logo" className="w-full h-full object-contain" />
             </div>
-            <span className="text-xl font-black text-[#330066] dark:text-purple-300 uppercase tracking-tighter">
-              Bananas
+            <span className="text-2xl md:text-3xl font-black text-black dark:text-white uppercase tracking-tighter">
+              Pumpbanana
             </span>
           </Link>
 
-          {/* Right-aligned Navigation Items (Absolute to keep title centered) */}
+          {/* Right-aligned Navigation Items */}
           <div className="absolute right-0 flex items-center gap-4 sm:gap-6">
             {isAdmin && (
               <>
-                 <Link href="/admin/create" className="text-sm font-semibold text-[#330066] hover:text-purple-700 transition-colors px-2 py-1">
+                 <Link href="/admin/create" className="text-sm font-bold text-black dark:text-white hover:opacity-70 transition-opacity px-2 py-1">
                   Create
                 </Link>
-                <Link href="/admin/keywords" className="text-sm font-semibold text-[#330066] hover:text-purple-700 transition-colors px-2 py-1">
+                <Link href="/admin/keywords" className="text-sm font-bold text-black dark:text-white hover:opacity-70 transition-opacity px-2 py-1">
                   Keywords
                 </Link>
               </>
             )}
             {user && (
-              <Link href="/favorites" className="text-sm font-semibold text-[#330066] hover:text-purple-700 transition-colors px-2 py-1">
+              <Link href="/favorites" className="text-sm font-bold text-black dark:text-white hover:opacity-70 transition-opacity px-2 py-1">
                 My Likes
               </Link>
             )}
