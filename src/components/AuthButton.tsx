@@ -43,9 +43,9 @@ export default function AuthButton() {
     <>
       <button
         onClick={() => setIsModalOpen(true)}
-        className="px-6 py-2 text-sm font-medium text-white bg-black hover:bg-gray-800 rounded-full transition-all shadow-lg hover:shadow-xl"
+        className="px-6 py-2 text-sm font-medium text-white bg-[#330066] hover:bg-[#4a0080] rounded-full transition-all shadow-lg hover:shadow-xl"
       >
-        Login / Sign Up
+        Login
       </button>
 
       <AuthModal 

@@ -10,6 +10,9 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "Bananas - AI Style Collection",
   description: "Discover and create amazing AI styles.",
+  icons: {
+    icon: '/banana-logo.svg',
+  },
 };
 
 export default function RootLayout({
@@ -21,7 +24,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={cn(inter.className, "bg-gray-50 min-h-screen")}>
         <NavBar />
-        <main className="pt-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <main className="pt-32 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
           {children}
         </main>
         <Footer />

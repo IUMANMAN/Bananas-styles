@@ -3,7 +3,7 @@ import Link from 'next/link'
 
 export default function Footer() {
   return (
-    <footer className="bg-white border-t border-gray-100 py-12 mt-auto">
+    <footer className="w-full py-12 px-6 bg-white dark:bg-black border-t border-gray-100 dark:border-gray-800 mt-20 relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col items-center justify-center space-y-8">
           
@@ -21,7 +21,7 @@ export default function Footer() {
               href="https://instagram.com" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="p-3 bg-gray-50 rounded-full text-gray-600 hover:bg-black hover:text-white transition-all duration-300 hover:scale-110"
+              className="p-3 bg-gray-50 rounded-full text-[#330066] hover:bg-[#330066] hover:text-white transition-all duration-300 hover:scale-110"
             >
               <Instagram className="w-5 h-5" />
             </a>
@@ -30,7 +30,7 @@ export default function Footer() {
               href="https://tiktok.com" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="p-3 bg-gray-50 rounded-full text-gray-600 hover:bg-black hover:text-white transition-all duration-300 hover:scale-110"
+              className="p-3 bg-gray-50 rounded-full text-[#330066] hover:bg-[#330066] hover:text-white transition-all duration-300 hover:scale-110"
             >
               {/* TikTok Icon SVG */}
               <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
@@ -42,7 +42,7 @@ export default function Footer() {
               href="https://twitter.com" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="p-3 bg-gray-50 rounded-full text-gray-600 hover:bg-black hover:text-white transition-all duration-300 hover:scale-110"
+              className="p-3 bg-gray-50 rounded-full text-[#330066] hover:bg-[#330066] hover:text-white transition-all duration-300 hover:scale-110"
             >
               {/* X (Twitter) Icon SVG */}
               <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
@@ -54,7 +54,7 @@ export default function Footer() {
               href="https://xiaohongshu.com" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="p-3 bg-gray-50 rounded-full text-gray-600 hover:bg-black hover:text-white transition-all duration-300 hover:scale-110 group"
+              className="p-3 bg-gray-50 rounded-full text-[#330066] hover:bg-[#330066] hover:text-white transition-all duration-300 hover:scale-110 group"
             >
               {/* Xiaohongshu (RedNote) - Simple text representation or generic icon if specific SVG unavailable, using a stylized '红' or similar */}
               <span className="text-xs font-bold group-hover:text-white">小红书</span>

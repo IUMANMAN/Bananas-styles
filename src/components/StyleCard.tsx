@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { Heart, Eye } from 'lucide-react'
+import { Heart, Eye, Share2, Check } from 'lucide-react'
 import StyleModal from './StyleModal'
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
@@ -20,7 +20,6 @@ interface StyleCardProps {
 
 export default function StyleCard({ id, title, imageUrl, originalImageUrl, introduction, prompt, initialLiked = false }: StyleCardProps) {
   const [liked, setLiked] = useState(initialLiked)
-  const [isHovered, setIsHovered] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const supabase = createClient()
 
@@ -33,7 +32,6 @@ export default function StyleCard({ id, title, imageUrl, originalImageUrl, intro
     
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) {
-      // Prompt login or handle unauthenticated state
       alert('Please login to save styles')
       return
     }
@@ -48,89 +46,93 @@ export default function StyleCard({ id, title, imageUrl, originalImageUrl, intro
     }
   }
 
+  const [copied, setCopied] = useState(false)
+
+  const handleShare = async (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    const url = `${window.location.origin}/style/${id}`
+    try {
+      await navigator.clipboard.writeText(url)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch (err) {
+      console.error('Failed to copy', err)
+    }
+  }
+
   return (
     <>
       <div 
-        className="group relative mb-6 break-inside-avoid rounded-2xl overflow-hidden bg-white shadow-md hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-1"
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-        onTouchStart={() => setIsHovered(true)}
+        className="group relative mb-8 break-inside-avoid rounded-3xl overflow-hidden bg-white shadow-lg hover:shadow-2xl transition-all duration-300"
       >
         <div 
           onClick={() => setIsModalOpen(true)}
-          className="relative aspect-[3/4] w-full overflow-hidden cursor-pointer"
+          className="cursor-pointer"
         >
-          {/* Generated Image (Default) */}
-          <div className={cn(
-            "absolute inset-0 transition-opacity duration-700 ease-in-out",
-            isHovered && originalImageUrl ? "opacity-0" : "opacity-100"
-          )}>
-            <Image
-              src={imageUrl}
-              alt={displayTitle}
-              fill
-              className="object-cover transform group-hover:scale-105 transition-transform duration-700"
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            />
-            <div className="absolute top-3 left-3 px-3 py-1.5 bg-gradient-to-r from-purple-600 to-pink-600 backdrop-blur-md rounded-full text-xs font-semibold text-white uppercase tracking-wide shadow-lg">
-              AI Generated
-            </div>
-          </div>
-
-          {/* Original Image (Hover) */}
-          {originalImageUrl && (
+          <div className="flex w-full">
+             {/* Generated Image (Left side if original exists, otherwise full) */}
             <div className={cn(
-              "absolute inset-0 transition-opacity duration-700 ease-in-out",
-              isHovered ? "opacity-100" : "opacity-0"
+              "relative aspect-[3/4] overflow-hidden bg-gray-100",
+              originalImageUrl ? "w-1/2 border-r border-white/20" : "w-full"
             )}>
               <Image
-                src={originalImageUrl}
-                alt={`Original - ${displayTitle}`}
+                src={imageUrl}
+                alt={displayTitle}
                 fill
-                className="object-cover transform group-hover:scale-105 transition-transform duration-700"
+                className="object-cover transition-transform duration-700 group-hover:scale-105"
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               />
-              <div className="absolute top-3 left-3 px-3 py-1.5 bg-gradient-to-r from-blue-600 to-cyan-600 backdrop-blur-md rounded-full text-xs font-semibold text-white uppercase tracking-wide shadow-lg">
-                Original
+              <div className="absolute top-2 left-2 px-2 py-1 bg-black/40 backdrop-blur-md rounded-md text-[10px] font-bold text-white uppercase tracking-wider">
+                AI
               </div>
             </div>
-          )}
 
-          <div className={cn(
-            "absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-0 transition-opacity duration-500",
-            isHovered ? "opacity-100" : "opacity-0"
-          )} />
+            {/* Original Image (Right side) */}
+            {originalImageUrl && (
+              <div className="relative w-1/2 aspect-[3/4] overflow-hidden bg-gray-100">
+                <Image
+                  src={originalImageUrl}
+                  alt={`Original - ${displayTitle}`}
+                  fill
+                  className="object-cover transition-transform duration-700 group-hover:scale-105"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                />
+                 <div className="absolute top-2 right-2 px-2 py-1 bg-black/40 backdrop-blur-md rounded-md text-[10px] font-bold text-white uppercase tracking-wider">
+                  Ref
+                </div>
+              </div>
+            )}
+          </div>
           
-          {/* View Details Overlay Button */}
-          <div className={cn(
-            "absolute inset-0 flex items-center justify-center transition-all duration-500 pointer-events-none",
-            isHovered ? "opacity-100" : "opacity-0"
-          )}>
-            <div className="bg-white/95 backdrop-blur-md px-6 py-3 rounded-full text-gray-900 font-semibold flex items-center gap-2 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500 shadow-xl">
-              <Eye className="w-5 h-5" />
-              <span>View Details</span>
+          {/* Card Footer: Title and Actions - Clean White Background */}
+          <div className="bg-white dark:bg-zinc-900 p-4 flex justify-between items-center gap-3">
+             <h3 className="font-bold text-[#330066] dark:text-purple-300 text-sm sm:text-base leading-tight line-clamp-2 flex-grow">
+              {displayTitle}
+            </h3>
+            
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handleShare}
+                className="flex-shrink-0 p-2 rounded-full text-gray-400 hover:text-[#330066] hover:bg-gray-50 transition-all duration-200"
+                title="Share Link"
+              >
+                {copied ? <Check className="w-5 h-5 text-green-500" /> : <Share2 className="w-5 h-5" />}
+              </button>
+
+              <button
+                onClick={toggleLike}
+                className={cn(
+                  "flex-shrink-0 p-2 rounded-full transition-all duration-200",
+                  liked 
+                    ? "text-red-500 bg-red-50" 
+                    : "text-gray-400 hover:text-red-500 hover:bg-gray-50"
+                )}
+              >
+                <Heart className={cn("w-5 h-5", liked && "fill-current")} />
+              </button>
             </div>
           </div>
-        </div>
-          
-        <button
-          onClick={toggleLike}
-          className={cn(
-            "absolute top-3 right-3 p-2.5 rounded-full backdrop-blur-md transition-all duration-300 transform z-10 shadow-lg",
-            liked 
-              ? "bg-gradient-to-r from-red-500 to-pink-500 text-white scale-110" 
-              : "bg-white/90 text-gray-700 hover:bg-white hover:scale-110",
-            "opacity-100 translate-y-0"
-          )}
-        >
-          <Heart className={cn("w-5 h-5", liked && "fill-current")} />
-        </button>
-        
-        <div 
-          onClick={() => setIsModalOpen(true)}
-          className="p-4 cursor-pointer bg-gradient-to-b from-white to-gray-50"
-        >
-          <h3 className="font-semibold text-gray-900 truncate text-base">{displayTitle}</h3>
         </div>
       </div>
 

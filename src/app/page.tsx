@@ -38,21 +38,18 @@ export default async function Home() {
     <div className="min-h-screen pb-20">
       <div className="mb-16 text-center space-y-6 px-4">
         <div className="inline-block">
-          <h1 className="text-5xl md:text-7xl font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 mb-2">
-            Nano Banana AI
+          <h1 className="text-4xl md:text-6xl font-black text-gray-900 tracking-tight mb-4">
+            Your Photo Prompts Collection
           </h1>
-          <p className="text-xl md:text-2xl font-bold text-gray-800">
-            Prompt Collection
-          </p>
         </div>
         
         <p className="text-gray-600 text-base md:text-lg max-w-3xl mx-auto leading-relaxed">
-          Discover curated prompts for <span className="font-semibold text-purple-600">Nano Banana AI</span> image generation and editing. 
+          Discover curated prompts for <span className="font-semibold text-orange-500">Bananas</span> image generation and editing. 
           Transform your ideas into stunning visuals with our handpicked prompt library.
         </p>
         
         <div className="flex flex-wrap items-center justify-center gap-3">
-          <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-purple-100 to-pink-100 border border-purple-200 rounded-full text-sm font-semibold text-purple-700 shadow-sm">
+          <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-yellow-100 to-orange-100 border border-yellow-200 rounded-full text-sm font-semibold text-yellow-800 shadow-sm">
             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
               <path d="M10 2a8 8 0 100 16 8 8 0 000-16zm1 11H9v-2h2v2zm0-4H9V5h2v4z"/>
             </svg>

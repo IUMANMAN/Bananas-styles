@@ -60,7 +60,82 @@ export async function addKeyword(keyword: string) {
     return { success: true }
 }
 
+// ... imports
+import { r2, R2_BUCKET, R2_PUBLIC_URL } from '@/lib/r2'
+import { PutObjectCommand } from '@aws-sdk/client-s3'
+import { v4 as uuidv4 } from 'uuid'
+
+async function uploadToR2(file: File, folder: string): Promise<string> {
+    const buffer = Buffer.from(await file.arrayBuffer())
+    const ext = file.name.split('.').pop()
+    const key = `${folder}/${uuidv4()}.${ext}`
+
+    await r2.send(new PutObjectCommand({
+        Bucket: R2_BUCKET,
+        Key: key,
+        Body: buffer,
+        ContentType: file.type,
+    }))
+
+    return `${R2_PUBLIC_URL}/${key}`
+}
+
+export async function createStyle(formData: FormData) {
+    const admin = await isAdmin()
+    if (!admin) {
+        return { success: false, error: 'Unauthorized' }
+    }
+
+    const title = formData.get('title') as string
+    const introduction = formData.get('introduction') as string
+    const prompt = formData.get('prompt') as string
+
+    // File handling
+    const generatedImageFile = formData.get('generated_image_file') as File
+    const originalImageFile = formData.get('original_image_file') as File
+
+    let generated_image_url = formData.get('generated_image_url') as string
+    let original_image_url = formData.get('original_image_url') as string
+
+    // Upload logic
+    try {
+        if (generatedImageFile && generatedImageFile.size > 0) {
+            generated_image_url = await uploadToR2(generatedImageFile, 'generated')
+        }
+        if (originalImageFile && originalImageFile.size > 0) {
+            original_image_url = await uploadToR2(originalImageFile, 'originals')
+        }
+    } catch (error) {
+        console.error('Upload error:', error)
+        return { success: false, error: 'Failed to upload images' }
+    }
+
+    if (!title || !prompt || !generated_image_url) {
+        return { success: false, error: 'Missing required fields (Title, Prompt, Generated Image)' }
+    }
+
+    const supabase = await createClient()
+    const { error } = await supabase
+        .from('styles')
+        .insert({
+            title,
+            introduction,
+            prompt,
+            generated_image_url,
+            original_image_url: original_image_url || null
+        })
+
+    if (error) {
+        console.error('Error creating style:', error)
+        return { success: false, error: error.message }
+    }
+
+    revalidatePath('/')
+    return { success: true }
+}
+
 export async function deleteKeyword(id: string) {
+    // ... existing deleteKeyword code
     const admin = await isAdmin()
     if (!admin) {
         return { success: false, error: 'Unauthorized' }
