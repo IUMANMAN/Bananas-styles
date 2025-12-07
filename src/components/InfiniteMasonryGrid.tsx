@@ -54,7 +54,16 @@ export default function InfiniteMasonryGrid({ initialStyles, initialLikedIds, in
       if (result.styles.length === 0) {
         setHasMore(false)
       } else {
-        setStyles(prev => [...prev, ...result.styles])
+        setStyles(prev => {
+          const existingIds = new Set(prev.map(s => s.id))
+          // First deduplicate within the new batch
+          const uniqueBatch = result.styles.filter((s, index, self) => 
+            index === self.findIndex((t) => t.id === s.id)
+          )
+          // Then filter against existing
+          const uniqueNewStyles = uniqueBatch.filter(s => !existingIds.has(s.id))
+          return [...prev, ...uniqueNewStyles]
+        })
         setLikedIds(prev => {
           const newSet = new Set(prev)
           result.likedIds.forEach(id => newSet.add(id))

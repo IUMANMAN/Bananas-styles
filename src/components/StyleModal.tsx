@@ -67,22 +67,20 @@ export default function StyleModal({ isOpen, onClose, style }: StyleModalProps) 
         onClick={onClose}
       />
 
-      {/* Modal Content */}
+      {/* Modal Content - Bottom Sheet on Mobile, Centered Card on Desktop */}
       <div className="relative w-full max-w-6xl bg-white dark:bg-black sm:rounded-2xl shadow-2xl overflow-hidden flex flex-col md:flex-row h-[100dvh] sm:h-[90vh] animate-in fade-in zoom-in-95 duration-200">
         
-        {/* Close Button */}
+        {/* Close Button - Desktop Only (Mobile uses bottom button) */}
         <button 
           onClick={onClose}
-          className="absolute top-4 right-4 z-30 p-2 bg-black/40 hover:bg-black/60 text-white rounded-full transition-colors backdrop-blur-md"
+          className="hidden md:flex absolute top-4 right-4 z-30 p-2 bg-black/40 hover:bg-black/60 text-white rounded-full transition-colors backdrop-blur-md"
         >
           <X className="w-5 h-5" />
         </button>
 
         {/* Unified Scroll Container for Mobile - Split for Desktop */}
-        {/* Unified Scroll Container (Mobile: Vertical flow, Desktop: row) */}
-         <div className="flex flex-col md:flex-row w-full h-full overflow-y-auto md:overflow-hidden">
+         <div className="flex flex-col md:flex-row w-full h-full overflow-y-auto md:overflow-hidden touch-auto">
         
-          {/* Images Section (Left/Top) */}
           {/* Images Section (Left/Top) */}
           <div className="w-full md:w-3/5 bg-black flex flex-row flex-nowrap h-[35vh] md:h-full shrink-0">
             {/* Original Image */}
@@ -118,8 +116,8 @@ export default function StyleModal({ isOpen, onClose, style }: StyleModalProps) 
           </div>
 
           {/* Details Section (Right/Bottom) */}
-          <div className="w-full md:w-2/5 flex flex-col bg-white dark:bg-black md:h-full md:overflow-hidden">
-            <div className="p-6 md:p-8 md:overflow-y-auto flex-1 pb-24 md:pb-8">
+          <div className="w-full md:w-2/5 flex flex-col bg-white dark:bg-black md:h-full md:overflow-hidden bg-white dark:bg-black">
+            <div className="p-6 md:p-8 md:overflow-y-auto flex-1 pb-0 md:pb-8">
               <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4">
                 {style.title}
               </h2>
@@ -209,20 +207,20 @@ export default function StyleModal({ isOpen, onClose, style }: StyleModalProps) 
                   <HighlightedText text={style.prompt} keywords={keywords} />
                 </p>
               </div>
+              </div>
+            </div>
+            
+            {/* Footer Actions (Sticky at bottom) */}
+            <div className="p-4 md:p-6 border-t border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-zinc-900 md:relative sticky bottom-0 left-0 right-0 z-20 shrink-0 pb-safe">
+              <button 
+                onClick={onClose}
+                className="w-full py-3 px-4 bg-black dark:bg-white text-white dark:text-black rounded-xl font-medium hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors shadow-lg hover:shadow-xl transform active:scale-[0.98] duration-200"
+              >
+                {t('Close Details', '关闭详情')}
+              </button>
             </div>
           </div>
-          
-          {/* Footer Actions (Fixed at bottom on mobile) */}
-          <div className="p-6 border-t border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-zinc-900/50 md:relative fixed bottom-0 left-0 right-0 z-20">
-            <button 
-              onClick={onClose}
-              className="w-full py-3 px-4 bg-black dark:bg-white text-white dark:text-black rounded-xl font-medium hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors shadow-lg hover:shadow-xl transform active:scale-[0.98] duration-200"
-            >
-              {t('Close Details', '关闭详情')}
-            </button>
-          </div>
         </div>
-      </div>
       </div>
     </div>,
     document.body
