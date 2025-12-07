@@ -80,10 +80,16 @@ async function uploadToR2(file: File, folder: string): Promise<string> {
     return `${R2_PUBLIC_URL}/${key}`
 }
 
+import { createAdminClient } from '@/lib/supabase/admin'
+
+// ... (other imports stay same)
+
 export async function createStyle(formData: FormData) {
-    const admin = await isAdmin()
-    if (!admin) {
-        return { success: false, error: 'Unauthorized' }
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user) {
+        return { success: false, error: 'Not authenticated' }
     }
 
     const title = formData.get('title') as string
@@ -115,13 +121,12 @@ export async function createStyle(formData: FormData) {
         return { success: false, error: 'Missing required fields (Title, Prompt, Generated Image)' }
     }
 
-    const supabase = await createClient()
     // Generate slug from title
     const slug = title
         .toLowerCase()
-        .replace(/[^a-z0-9\s-]/g, '') // Remove special chars
-        .replace(/\s+/g, '-')         // Replace spaces with hyphens
-        .replace(/-+/g, '-')          // Remove duplicate hyphens
+        .replace(/[^a-z0-9\s-]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-')
         .trim()
 
     const { data: style, error } = await supabase
@@ -134,6 +139,7 @@ export async function createStyle(formData: FormData) {
             generated_image_url,
             original_image_url: original_image_url || null,
             slug,
+            user_id: user.id
         })
         .select()
         .single()
@@ -149,48 +155,135 @@ export async function createStyle(formData: FormData) {
         try {
             const keywords = JSON.parse(keywordsJson) as string[]
             if (keywords.length > 0) {
-                // Determine user ID (we know user exists from update above, but need id)
-                const { data: { user } } = await supabase.auth.getUser()
-                if (user) {
-                    for (const k of keywords) {
-                        const keywordText = k.trim().toLowerCase()
-                        if (!keywordText) continue
+                for (const k of keywords) {
+                    const keywordText = k.trim().toLowerCase()
+                    if (!keywordText) continue
 
-                        // 1. Find or Create Keyword
-                        let keywordId: string | null = null
+                    // 1. Find or Create Keyword
+                    let keywordId: string | null = null
 
-                        const { data: existing } = await supabase
+                    const { data: existing } = await supabase
+                        .from('keywords')
+                        .select('id')
+                        .eq('keyword', keywordText)
+                        .single()
+
+                    if (existing) {
+                        keywordId = existing.id
+                    } else {
+                        const { data: newKeyword } = await supabase
                             .from('keywords')
+                            .insert({ keyword: keywordText, created_by: user.id })
                             .select('id')
-                            .eq('keyword', keywordText)
                             .single()
+                        if (newKeyword) keywordId = newKeyword.id
+                    }
 
-                        if (existing) {
-                            keywordId = existing.id
-                        } else {
-                            const { data: newKeyword } = await supabase
-                                .from('keywords')
-                                .insert({ keyword: keywordText, created_by: user.id })
-                                .select('id')
-                                .single()
-                            if (newKeyword) keywordId = newKeyword.id
-                        }
-
-                        // 2. Link to Style
-                        if (keywordId) {
-                            await supabase
-                                .from('style_keywords')
-                                .upsert(
-                                    { style_id: style.id, keyword_id: keywordId },
-                                    { onConflict: 'style_id, keyword_id', ignoreDuplicates: true }
-                                )
-                        }
+                    // 2. Link to Style
+                    if (keywordId) {
+                        await supabase
+                            .from('style_keywords')
+                            .upsert(
+                                { style_id: style.id, keyword_id: keywordId },
+                                { onConflict: 'style_id, keyword_id', ignoreDuplicates: true }
+                            )
                     }
                 }
             }
         } catch (e) {
             console.error('Error processing keywords:', e)
         }
+    }
+
+    revalidatePath('/')
+    return { success: true }
+}
+
+export async function getStyle(id: string) {
+    const supabase = await createClient()
+    const { data, error } = await supabase
+        .from('styles')
+        .select('*')
+        .eq('id', id)
+        .single()
+
+    if (error) return null
+    return data
+}
+
+export async function updateStyle(formData: FormData) {
+    const id = formData.get('id') as string
+    const admin = await isAdmin()
+    const supabase = admin ? createAdminClient() : await createClient()
+
+    // Auth check implicitly handled by RLS if not admin, but good to check user exists
+    if (!admin) {
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user) return { success: false, error: 'Unauthorized' }
+    }
+
+    const title = formData.get('title') as string
+    const introduction = formData.get('introduction') as string
+    const prompt = formData.get('prompt') as string
+    const source_url = formData.get('source_url') as string
+
+    // File handling
+    const generatedImageFile = formData.get('generated_image_file') as File
+    const originalImageFile = formData.get('original_image_file') as File
+
+    const updates: any = {
+        title,
+        introduction,
+        prompt,
+        source_url: source_url || null,
+    }
+
+    // Upload logic if new files
+    try {
+        if (generatedImageFile && generatedImageFile.size > 0) {
+            updates.generated_image_url = await uploadToR2(generatedImageFile, 'generated')
+        }
+        if (originalImageFile && originalImageFile.size > 0) {
+            updates.original_image_url = await uploadToR2(originalImageFile, 'originals')
+        }
+    } catch (error) {
+        console.error('Upload error:', error)
+        return { success: false, error: 'Failed to upload images' }
+    }
+
+    const { error } = await supabase
+        .from('styles')
+        .update(updates)
+        .eq('id', id)
+
+    if (error) {
+        console.error('Error updating style:', error)
+        return { success: false, error: error.message }
+    }
+
+    revalidatePath('/')
+    return { success: true }
+}
+
+export async function deleteStyle(id: string) {
+    const admin = await isAdmin()
+
+    // If admin, use service role to bypass RLS
+    // If user, use standard client (RLS enforced)
+    const supabase = admin ? createAdminClient() : await createClient()
+
+    // If not admin, we must ensure user is authenticated logic handled by RLS?
+    // createClient() uses cookies, so it has user context. RLS "Users can delete their own styles" will work.
+    // If admin, createAdminClient() has service role, bypassing RLS.
+
+    const { error } = await supabase
+        .from('styles')
+        .delete()
+        .eq('id', id)
+
+    if (error) {
+        console.error('Error deleting style:', error)
+        return { success: false, error: error.message }
     }
 
     revalidatePath('/')

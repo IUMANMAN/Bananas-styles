@@ -4,10 +4,12 @@ import MasonryGrid from "@/components/MasonryGrid";
 import InfiniteMasonryGrid from "@/components/InfiniteMasonryGrid";
 import { createClient } from "@/lib/supabase/server";
 import SearchInput from "@/components/SearchInput";
+import { isAdmin } from "@/lib/auth";
 
 export default async function Home({ searchParams }: { searchParams: Promise<{ q?: string; styleSlug?: string }> }) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
+  const adminStatus = await isAdmin()
   const { q: query, styleSlug: initialStyleSlug } = await searchParams;
 
   // Initial Fetch (Page 1, 30 items)
@@ -54,6 +56,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ q
   // Fetch Initial User Likes if logged in
   let initialLikedIds: string[] = [];
   if (user && initialStyles.length > 0) {
+    // ... existing logic ...
     const styleIds = initialStyles.map(s => s.id);
     if (initialOpenedStyle && !styleIds.includes(initialOpenedStyle.id)) {
         styleIds.push(initialOpenedStyle.id);
@@ -109,6 +112,8 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ q
         initialStyles={initialStyles} 
         initialLikedIds={initialLikedIds} 
         initialOpenedStyle={initialOpenedStyle}
+        currentUserId={user?.id}
+        isAdmin={adminStatus}
       />
     </div>
   );

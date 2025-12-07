@@ -15,15 +15,18 @@ interface Style {
   prompt?: string
   created_at: string
   slug?: string
+  user_id?: string
 }
 
 interface InfiniteMasonryGridProps {
   initialStyles: Style[]
   initialLikedIds: string[]
   initialOpenedStyle?: Style | null
+  currentUserId?: string
+  isAdmin?: boolean
 }
 
-export default function InfiniteMasonryGrid({ initialStyles, initialLikedIds, initialOpenedStyle }: InfiniteMasonryGridProps) {
+export default function InfiniteMasonryGrid({ initialStyles, initialLikedIds, initialOpenedStyle, currentUserId, isAdmin }: InfiniteMasonryGridProps) {
   const [styles, setStyles] = useState<Style[]>(() => {
     if (initialOpenedStyle && !initialStyles.find(s => s.id === initialOpenedStyle.id)) {
       return [initialOpenedStyle, ...initialStyles]
@@ -95,6 +98,9 @@ export default function InfiniteMasonryGrid({ initialStyles, initialLikedIds, in
             initialLiked={likedIds.has(style.id)}
             initialOpenedStyleId={initialOpenedStyle?.id}
             slug={style.slug}
+            ownerId={style.user_id}
+            currentUserId={currentUserId}
+            isAdmin={isAdmin}
           />
         ))}
       </MasonryGrid>

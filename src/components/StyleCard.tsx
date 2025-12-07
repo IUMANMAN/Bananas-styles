@@ -1,13 +1,13 @@
-'use client'
-
 import Image from 'next/image'
 import Link from 'next/link'
-import { Heart, Eye, Share2, Check, Copy } from 'lucide-react'
+import { Heart, Eye, Share2, Check, Copy, Trash2, Pencil } from 'lucide-react'
 import StyleModal from './StyleModal'
 import ShareModal from './ShareModal'
 import { useState, useEffect } from 'react'
 import { cn } from '@/lib/utils'
 import { createClient } from '@/lib/supabase/client'
+import { useRouter } from 'next/navigation'
+import { deleteStyle } from '@/app/admin/actions'
 
 interface Style {
   id: string
@@ -19,6 +19,7 @@ interface Style {
   source_url?: string
   is_liked?: boolean
   slug?: string
+  user_id?: string
 }
 
 interface StyleCardProps {
@@ -31,39 +32,73 @@ interface StyleCardProps {
   initialLiked?: boolean
   initialOpenedStyleId?: string
   slug?: string
+  ownerId?: string
+  currentUserId?: string
+  isAdmin?: boolean
 }
 
-export default function StyleCard({ id, title, imageUrl, originalImageUrl, introduction, prompt, initialLiked = false, initialOpenedStyleId, slug }: StyleCardProps) {
+export default function StyleCard({ 
+  id, 
+  title, 
+  imageUrl, 
+  originalImageUrl, 
+  introduction, 
+  prompt, 
+  initialLiked = false, 
+  initialOpenedStyleId, 
+  slug,
+  ownerId,
+  currentUserId,
+  isAdmin
+}: StyleCardProps) {
   const [liked, setLiked] = useState(initialLiked)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isShareModalOpen, setIsShareModalOpen] = useState(false)
-  const supabase = createClient()
+  const [isDeleting, setIsDeleting] = useState(false)
   
-  // Use slug if available, fallback to ID (though DB enforces slug)
+  const supabase = createClient()
+  const router = useRouter()
+  
+  // Use slug if available, fallback to ID
   const shareId = slug || id
+
+  const canDelete = isAdmin || (currentUserId && ownerId && currentUserId === ownerId)
+
+  const handleDelete = async (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    
+    if (!confirm('Are you sure you want to delete this style? This cannot be undone.')) return
+
+    setIsDeleting(true)
+    const result = await deleteStyle(id)
+    
+    if (result.success) {
+      router.refresh()
+    } else {
+      alert('Failed to delete: ' + result.error)
+      setIsDeleting(false)
+    }
+  }
 
   const handleOpenModal = () => {
     setIsModalOpen(true)
-    // Update URL without reload
     window.history.pushState({ modalOpen: true }, '', `/style/${shareId}`)
   }
 
   const handleCloseModal = () => {
     setIsModalOpen(false)
-    // Revert URL to home
     window.history.pushState(null, '', '/')
   }
 
   useEffect(() => {
     if (initialOpenedStyleId && id === initialOpenedStyleId) {
       setIsModalOpen(true)
-      // Clean up the URL parameter if desired, or leave it. 
-      // User asked for "each style has a link", so setting it to /style/[slug] is good.
       window.history.replaceState({ modalOpen: true }, '', `/style/${shareId}`)
     }
   }, [id, initialOpenedStyleId, shareId])
 
-  // Remove leading numbering (e.g., "1. ", "12. ")
+  // Remove leading numbering
   const displayTitle = title.replace(/^\d+\.\s*/, '')
 
   const toggleLike = async (e: React.MouseEvent) => {
@@ -98,29 +133,23 @@ export default function StyleCard({ id, title, imageUrl, originalImageUrl, intro
   }
 
   const handleShare = async (e: React.MouseEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    const url = `${window.location.origin}/style/${shareId}`
-    try {
-      await navigator.clipboard.writeText(url)
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
-    } catch (err) {
-      console.error('Failed to copy', err)
-    }
+    // ... existing share logic
   }
 
   return (
     <>
       <div 
-        className="group relative mb-8 break-inside-avoid rounded-3xl overflow-hidden bg-white shadow-lg hover:shadow-2xl transition-all duration-300"
+        className={cn(
+          "group relative mb-8 break-inside-avoid rounded-3xl overflow-hidden bg-white shadow-lg hover:shadow-2xl transition-all duration-300",
+          isDeleting && "opacity-50 pointer-events-none"
+        )}
       >
         <div 
           onClick={handleOpenModal}
           className="cursor-pointer"
-      >
+        >
+          {/* ... Images ... */}
           <div className="flex w-full">
-            {/* Original Image (Left side if exists) */}
             {originalImageUrl && (
               <div className="relative w-1/2 aspect-[3/4] overflow-hidden bg-gray-100 border-r border-white/20">
                 <img
@@ -134,7 +163,6 @@ export default function StyleCard({ id, title, imageUrl, originalImageUrl, intro
               </div>
             )}
 
-             {/* Generated Image (Right side if original exists, otherwise full) */}
             <div className={cn(
               "relative aspect-[3/4] overflow-hidden bg-gray-100",
               originalImageUrl ? "w-1/2" : "w-full"
@@ -150,13 +178,33 @@ export default function StyleCard({ id, title, imageUrl, originalImageUrl, intro
             </div>
           </div>
           
-          {/* Card Footer: Title and Actions - Clean White Background */}
+          {/* Card Footer */}
           <div className="bg-white dark:bg-zinc-900 p-4 flex justify-between items-center gap-3">
              <h3 className="font-bold text-black dark:text-gray-200 text-sm sm:text-base leading-tight line-clamp-2 flex-grow">
               {displayTitle}
             </h3>
             
             <div className="flex items-center gap-2">
+              {canDelete && (
+                <>
+                  <Link
+                    href={`/admin/edit/${id}`}
+                    onClick={(e) => e.stopPropagation()}
+                    className="flex-shrink-0 p-2 rounded-full text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200"
+                    title="Edit Style"
+                  >
+                    <Pencil className="w-5 h-5" />
+                  </Link>
+                  <button
+                    onClick={handleDelete}
+                    className="flex-shrink-0 p-2 rounded-full text-gray-400 hover:text-red-600 hover:bg-red-50 transition-all duration-200"
+                    title="Delete Style"
+                  >
+                    <Trash2 className="w-5 h-5" />
+                  </button>
+                </>
+              )}
+
               <button
                 onClick={handleCopyPrompt}
                 className="flex-shrink-0 p-2 rounded-full text-gray-400 hover:text-yellow-600 hover:bg-yellow-50 transition-all duration-200 group/tooltip relative"

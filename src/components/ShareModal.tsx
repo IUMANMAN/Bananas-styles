@@ -150,7 +150,7 @@ export default function ShareModal({ isOpen, onClose, style }: ShareModalProps) 
                 {style.originalImageUrl && (
                   <div className="w-1/2 relative border-r border-white/20">
                     <img 
-                      src={imgSources.original || style.originalImageUrl} 
+                      src={imgSources.original || `/api/image-proxy?url=${encodeURIComponent(style.originalImageUrl)}`}
                       alt="Original" 
                       className="w-full h-full object-cover"
                       crossOrigin="anonymous"
@@ -162,7 +162,7 @@ export default function ShareModal({ isOpen, onClose, style }: ShareModalProps) 
                 )}
                 <div className={cn("relative", style.originalImageUrl ? "w-1/2" : "w-full")}>
                   <img 
-                    src={imgSources.generated || style.imageUrl} 
+                    src={imgSources.generated || `/api/image-proxy?url=${encodeURIComponent(style.imageUrl)}`}
                     alt="Generated" 
                     className="w-full h-full object-cover"
                     crossOrigin="anonymous"
