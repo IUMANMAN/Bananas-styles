@@ -116,6 +116,14 @@ export async function createStyle(formData: FormData) {
     }
 
     const supabase = await createClient()
+    // Generate slug from title
+    const slug = title
+        .toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, '') // Remove special chars
+        .replace(/\s+/g, '-')         // Replace spaces with hyphens
+        .replace(/-+/g, '-')          // Remove duplicate hyphens
+        .trim()
+
     const { error } = await supabase
         .from('styles')
         .insert({
@@ -124,7 +132,8 @@ export async function createStyle(formData: FormData) {
             prompt,
             source_url: source_url || null,
             generated_image_url,
-            original_image_url: original_image_url || null
+            original_image_url: original_image_url || null,
+            slug,
         })
 
     if (error) {

@@ -2,9 +2,10 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { Heart, Eye, Share2, Check } from 'lucide-react'
+import { Heart, Eye, Share2, Check, Copy } from 'lucide-react'
 import StyleModal from './StyleModal'
-import { useState } from 'react'
+import ShareModal from './ShareModal'
+import { useState, useEffect } from 'react'
 import { cn } from '@/lib/utils'
 import { createClient } from '@/lib/supabase/client'
 
@@ -17,6 +18,7 @@ interface Style {
   original_image_url?: string
   source_url?: string
   is_liked?: boolean
+  slug?: string
 }
 
 interface StyleCardProps {
@@ -27,12 +29,39 @@ interface StyleCardProps {
   introduction?: string
   prompt?: string
   initialLiked?: boolean
+  initialOpenedStyleId?: string
+  slug?: string
 }
 
-export default function StyleCard({ id, title, imageUrl, originalImageUrl, introduction, prompt, initialLiked = false }: StyleCardProps) {
+export default function StyleCard({ id, title, imageUrl, originalImageUrl, introduction, prompt, initialLiked = false, initialOpenedStyleId, slug }: StyleCardProps) {
   const [liked, setLiked] = useState(initialLiked)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false)
   const supabase = createClient()
+  
+  // Use slug if available, fallback to ID (though DB enforces slug)
+  const shareId = slug || id
+
+  const handleOpenModal = () => {
+    setIsModalOpen(true)
+    // Update URL without reload
+    window.history.pushState({ modalOpen: true }, '', `/style/${shareId}`)
+  }
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false)
+    // Revert URL to home
+    window.history.pushState(null, '', '/')
+  }
+
+  useEffect(() => {
+    if (initialOpenedStyleId && id === initialOpenedStyleId) {
+      setIsModalOpen(true)
+      // Clean up the URL parameter if desired, or leave it. 
+      // User asked for "each style has a link", so setting it to /style/[slug] is good.
+      window.history.replaceState({ modalOpen: true }, '', `/style/${shareId}`)
+    }
+  }, [id, initialOpenedStyleId, shareId])
 
   // Remove leading numbering (e.g., "1. ", "12. ")
   const displayTitle = title.replace(/^\d+\.\s*/, '')
@@ -58,11 +87,20 @@ export default function StyleCard({ id, title, imageUrl, originalImageUrl, intro
   }
 
   const [copied, setCopied] = useState(false)
+  const [promptCopied, setPromptCopied] = useState(false)
+
+  const handleCopyPrompt = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    navigator.clipboard.writeText(prompt || '')
+    setPromptCopied(true)
+    setTimeout(() => setPromptCopied(false), 2000)
+  }
 
   const handleShare = async (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
-    const url = `${window.location.origin}/style/${id}`
+    const url = `${window.location.origin}/style/${shareId}`
     try {
       await navigator.clipboard.writeText(url)
       setCopied(true)
@@ -78,40 +116,38 @@ export default function StyleCard({ id, title, imageUrl, originalImageUrl, intro
         className="group relative mb-8 break-inside-avoid rounded-3xl overflow-hidden bg-white shadow-lg hover:shadow-2xl transition-all duration-300"
       >
         <div 
-          onClick={() => setIsModalOpen(true)}
+          onClick={handleOpenModal}
           className="cursor-pointer"
-        >
+      >
           <div className="flex w-full">
-             {/* Generated Image (Left side if original exists, otherwise full) */}
-            <div className={cn(
-              "relative aspect-[3/4] overflow-hidden bg-gray-100",
-              originalImageUrl ? "w-1/2 border-r border-white/20" : "w-full"
-            )}>
-              <Image
-                src={imageUrl}
-                alt={displayTitle}
-                fill
-                className="object-cover transition-transform duration-700 group-hover:scale-105"
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              />
-              <div className="absolute top-2 left-2 px-2 py-1 bg-black/40 backdrop-blur-md rounded-md text-[10px] font-bold text-white uppercase tracking-wider">
-                AI
-              </div>
-            </div>
-
-            {/* Original Image (Right side) */}
+            {/* Original Image (Left side if exists) */}
             {originalImageUrl && (
-              <div className="relative w-1/2 aspect-[3/4] overflow-hidden bg-gray-100">
+              <div className="relative w-1/2 aspect-[3/4] overflow-hidden bg-gray-100 border-r border-white/20">
                 <img
                   src={originalImageUrl}
                   alt={`Original - ${displayTitle}`}
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                 />
-                 <div className="absolute top-2 right-2 px-2 py-1 bg-black/40 backdrop-blur-md rounded-md text-[10px] font-bold text-white uppercase tracking-wider">
+                 <div className="absolute top-2 left-2 px-2 py-1 bg-black/40 backdrop-blur-md rounded-md text-[10px] font-bold text-white uppercase tracking-wider">
                   Ref
                 </div>
               </div>
             )}
+
+             {/* Generated Image (Right side if original exists, otherwise full) */}
+            <div className={cn(
+              "relative aspect-[3/4] overflow-hidden bg-gray-100",
+              originalImageUrl ? "w-1/2" : "w-full"
+            )}>
+              <img
+                src={imageUrl}
+                alt={displayTitle}
+                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+              />
+              <div className="absolute top-2 right-2 px-2 py-1 bg-black/40 backdrop-blur-md rounded-md text-[10px] font-bold text-white uppercase tracking-wider">
+                AI
+              </div>
+            </div>
           </div>
           
           {/* Card Footer: Title and Actions - Clean White Background */}
@@ -122,11 +158,23 @@ export default function StyleCard({ id, title, imageUrl, originalImageUrl, intro
             
             <div className="flex items-center gap-2">
               <button
-                onClick={handleShare}
-                className="flex-shrink-0 p-2 rounded-full text-gray-400 hover:text-[#330066] hover:bg-gray-50 transition-all duration-200"
-                title="Share Link"
+                onClick={handleCopyPrompt}
+                className="flex-shrink-0 p-2 rounded-full text-gray-400 hover:text-yellow-600 hover:bg-yellow-50 transition-all duration-200 group/tooltip relative"
+                title="Copy Prompt"
               >
-                {copied ? <Check className="w-5 h-5 text-green-500" /> : <Share2 className="w-5 h-5" />}
+               {promptCopied ? <Check className="w-5 h-5 text-green-500" /> : <Copy className="w-5 h-5" />}
+              </button>
+
+              <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  e.preventDefault()
+                  setIsShareModalOpen(true)
+                }}
+                className="flex-shrink-0 p-2 rounded-full text-gray-400 hover:text-[#330066] hover:bg-gray-50 transition-all duration-200"
+                title="Share this Style"
+              >
+                <Share2 className="w-5 h-5" />
               </button>
 
               <button
@@ -137,6 +185,7 @@ export default function StyleCard({ id, title, imageUrl, originalImageUrl, intro
                     ? "text-red-500 bg-red-50" 
                     : "text-gray-400 hover:text-red-500 hover:bg-gray-50"
                 )}
+                title={liked ? "Unlike" : "Like & Collect"}
               >
                 <Heart className={cn("w-5 h-5", liked && "fill-current")} />
               </button>
@@ -147,10 +196,23 @@ export default function StyleCard({ id, title, imageUrl, originalImageUrl, intro
 
       <StyleModal 
         isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)} 
+        onClose={handleCloseModal} 
         style={{
           title: displayTitle,
           introduction,
+          prompt: prompt || '',
+          imageUrl,
+          originalImageUrl
+        }}
+      />
+
+      <ShareModal
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+        style={{
+          id,
+          slug: shareId,
+          title: displayTitle,
           prompt: prompt || '',
           imageUrl,
           originalImageUrl

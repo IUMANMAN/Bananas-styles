@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import { User } from '@supabase/supabase-js'
 import AuthModal from './AuthModal'
+import { LogIn } from 'lucide-react'
 
 export default function AuthButton() {
   const [user, setUser] = useState<User | null>(null)
@@ -43,8 +44,9 @@ export default function AuthButton() {
     <>
       <button
         onClick={() => setIsModalOpen(true)}
-        className="px-6 py-2 text-sm font-medium text-white bg-[#330066] hover:bg-[#4a0080] rounded-full transition-all shadow-lg hover:shadow-xl"
+        className="px-5 py-2.5 text-sm font-bold text-white bg-neutral-900 hover:bg-black rounded-full transition-all shadow-md hover:shadow-lg hover:scale-105 active:scale-95 flex items-center gap-2"
       >
+        <LogIn className="w-4 h-4" />
         Login
       </button>
 

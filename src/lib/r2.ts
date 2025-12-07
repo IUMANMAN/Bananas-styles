@@ -10,4 +10,4 @@ export const r2 = new S3Client({
 })
 
 export const R2_BUCKET = 'mypage'
-export const R2_PUBLIC_URL = process.env.R2_PUBLIC_URL || 'https://pub-da706efc88c11c0f5ec999dde8d3fc37.r2.dev'
+export const R2_PUBLIC_URL = process.env.R2_PUBLIC_URL || 'https://pumpbanana.com'

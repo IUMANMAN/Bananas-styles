@@ -27,6 +27,10 @@ const nextConfig: NextConfig = {
                 protocol: 'https',
                 hostname: 'pumpbanana.com',
             },
+            {
+                protocol: 'https',
+                hostname: '*.r2.cloudflarestorage.com',
+            },
         ],
     },
 };

@@ -14,15 +14,22 @@ interface Style {
   introduction?: string
   prompt?: string
   created_at: string
+  slug?: string
 }
 
 interface InfiniteMasonryGridProps {
   initialStyles: Style[]
   initialLikedIds: string[]
+  initialOpenedStyle?: Style | null
 }
 
-export default function InfiniteMasonryGrid({ initialStyles, initialLikedIds }: InfiniteMasonryGridProps) {
-  const [styles, setStyles] = useState<Style[]>(initialStyles)
+export default function InfiniteMasonryGrid({ initialStyles, initialLikedIds, initialOpenedStyle }: InfiniteMasonryGridProps) {
+  const [styles, setStyles] = useState<Style[]>(() => {
+    if (initialOpenedStyle && !initialStyles.find(s => s.id === initialOpenedStyle.id)) {
+      return [initialOpenedStyle, ...initialStyles]
+    }
+    return initialStyles
+  })
   const [likedIds, setLikedIds] = useState<Set<string>>(new Set(initialLikedIds))
   const [page, setPage] = useState(1)
   const [loading, setLoading] = useState(false)
@@ -86,6 +93,8 @@ export default function InfiniteMasonryGrid({ initialStyles, initialLikedIds }: 
             introduction={style.introduction}
             prompt={style.prompt}
             initialLiked={likedIds.has(style.id)}
+            initialOpenedStyleId={initialOpenedStyle?.id}
+            slug={style.slug}
           />
         ))}
       </MasonryGrid>

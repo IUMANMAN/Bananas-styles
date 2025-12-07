@@ -21,7 +21,7 @@ export async function fetchStyles(page: number, limit: number = 30) {
         return { styles: [], likedIds: [], hasMore: false }
     }
 
-    // Fetch User Likes if logged in
+    // Placeholder Likes if logged in
     let likedIds: string[] = []
     if (user && styles && styles.length > 0) {
         const styleIds = styles.map(s => s.id)

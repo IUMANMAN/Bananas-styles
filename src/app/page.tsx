@@ -1,20 +1,52 @@
+import Link from "next/link";
 import Image from "next/image";
 import MasonryGrid from "@/components/MasonryGrid";
 import InfiniteMasonryGrid from "@/components/InfiniteMasonryGrid";
 import { createClient } from "@/lib/supabase/server";
+import SearchInput from "@/components/SearchInput";
 
-export default async function Home() {
+export default async function Home({ searchParams }: { searchParams: Promise<{ q?: string; styleSlug?: string }> }) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
+  const { q: query, styleSlug: initialStyleSlug } = await searchParams;
 
   // Initial Fetch (Page 1, 30 items)
   const ITEMS_PER_PAGE = 30;
   
-  const { data: styles, count } = await supabase
+  let dbQuery = supabase
     .from("styles")
     .select("*", { count: "exact" })
     .order("created_at", { ascending: false })
-    .range(0, ITEMS_PER_PAGE - 1);
+
+  if (query) {
+    // Filter by title OR prompt containing the query (case insensitive)
+    dbQuery = dbQuery.or(`title.ilike.%${query}%,prompt.ilike.%${query}%`)
+  }
+
+  const { data: styles, count } = await dbQuery.range(0, ITEMS_PER_PAGE - 1);
+
+  // Fetch specific deep-linked style if requested
+  let initialOpenedStyle = null;
+  if (initialStyleSlug) {
+    // Check if the param looks like a UUID
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(initialStyleSlug);
+    
+    let query = supabase
+      .from("styles")
+      .select("*")
+    
+    if (isUuid) {
+      query = query.eq("id", initialStyleSlug)
+    } else {
+      query = query.eq("slug", initialStyleSlug)
+    }
+
+    const { data: singleStyle } = await query.single();
+
+    if (singleStyle) {
+      initialOpenedStyle = singleStyle;
+    }
+  }
 
   const totalStyles = count || 0;
   const initialStyles = styles || [];
@@ -23,6 +55,10 @@ export default async function Home() {
   let initialLikedIds: string[] = [];
   if (user && initialStyles.length > 0) {
     const styleIds = initialStyles.map(s => s.id);
+    if (initialOpenedStyle && !styleIds.includes(initialOpenedStyle.id)) {
+        styleIds.push(initialOpenedStyle.id);
+    }
+
     const { data: likes } = await supabase
       .from("user_likes")
       .select("style_id")
@@ -35,8 +71,9 @@ export default async function Home() {
   }
 
   return (
-    <div className="min-h-screen pb-20">
+    <div className="min-h-screen pb-8">
       <div className="mb-16 text-center space-y-6 px-4">
+        {/* ... Header Content ... */}
         <div className="inline-block">
           <h1 className="text-4xl md:text-6xl font-black text-gray-900 tracking-tight mb-4">
             Your Photo Prompts Collection
@@ -44,7 +81,7 @@ export default async function Home() {
         </div>
         
         <p className="text-gray-600 text-base md:text-lg max-w-3xl mx-auto leading-relaxed">
-          Discover curated prompts for <span className="font-semibold text-orange-500">PUMPBANANA</span> image generation and editing. 
+          Discover curated prompts for <span className="font-semibold text-orange-500">Nano Banana</span> image generation and editing. 
           Transform your ideas into stunning visuals with our handpicked prompt library.
         </p>
         
@@ -63,11 +100,15 @@ export default async function Home() {
             <span>Community Curated</span>
           </div>
         </div>
+
+        <SearchInput />
+
       </div>
 
       <InfiniteMasonryGrid 
         initialStyles={initialStyles} 
         initialLikedIds={initialLikedIds} 
+        initialOpenedStyle={initialOpenedStyle}
       />
     </div>
   );
