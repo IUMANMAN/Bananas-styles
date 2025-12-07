@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useCallback } from 'react'
 import MasonryGrid from './MasonryGrid'
 import StyleCard from './StyleCard'
 import { fetchStyles } from '@/app/actions'
@@ -41,7 +41,7 @@ export default function InfiniteMasonryGrid({ initialStyles, initialLikedIds, in
   const [page, setPage] = useState(1)
   const [loading, setLoading] = useState(false)
   const [hasMore, setHasMore] = useState(true)
-  const observerTarget = useRef<HTMLDivElement>(null)
+
 
   const loadMore = useCallback(async () => {
     if (loading || !hasMore) return
@@ -70,22 +70,7 @@ export default function InfiniteMasonryGrid({ initialStyles, initialLikedIds, in
     }
   }, [page, loading, hasMore])
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          loadMore()
-        }
-      },
-      { threshold: 0.1 }
-    )
 
-    if (observerTarget.current) {
-      observer.observe(observerTarget.current)
-    }
-
-    return () => observer.disconnect()
-  }, [loadMore])
 
   return (
     <>
@@ -113,11 +98,31 @@ export default function InfiniteMasonryGrid({ initialStyles, initialLikedIds, in
         ))}
       </MasonryGrid>
 
-      {/* Loading Indicator / Trigger */}
-      <div ref={observerTarget} className="h-8 flex items-center justify-center w-full mt-4">
-        {loading && <Loader2 className="w-8 h-8 animate-spin text-gray-400" />}
-        {!hasMore && styles.length > 0 && (
-          <p className="text-gray-400 text-sm">You've reached the end</p>
+      {/* Manual Load More Button */}
+      <div className="flex flex-col items-center justify-center w-full mt-4 mb-8 gap-4">
+        {hasMore ? (
+          <button
+            onClick={loadMore}
+            disabled={loading}
+            className="group relative inline-flex items-center justify-center px-8 py-3 font-semibold text-white transition-all duration-200 bg-black dark:bg-white dark:text-black rounded-full hover:bg-gray-800 dark:hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 dark:focus:ring-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+             {loading ? (
+                <>
+                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                  <span>Loading...</span>
+                </>
+             ) : (
+                <span className="flex items-center gap-2">
+                   Load More Styles
+                </span>
+             )}
+          </button>
+        ) : (
+          styles.length > 0 && (
+            <p className="text-gray-400 text-sm font-medium">
+              You've reached the end of the collection
+            </p>
+          )
         )}
       </div>
     </>

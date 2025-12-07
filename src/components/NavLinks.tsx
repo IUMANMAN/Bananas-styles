@@ -12,7 +12,7 @@ export default function NavLinks({ isAdmin, isLoggedIn }: NavLinksProps) {
   const { t } = useLanguage();
 
   return (
-    <div className="flex items-center gap-4 sm:gap-6">
+    <div className="flex items-center gap-2 sm:gap-6">
       <Link 
         href="/guides" 
         className="text-sm font-bold text-black dark:text-white hover:opacity-70 transition-opacity px-2 py-1"

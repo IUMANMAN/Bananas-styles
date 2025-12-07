@@ -78,12 +78,12 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ q
       <div className="mb-16 text-center space-y-6 px-4">
         {/* ... Header Content ... */}
         <div className="inline-block">
-          <h1 className="text-4xl md:text-6xl font-black text-gray-900 tracking-tight mb-4">
+          <h1 className="text-4xl md:text-6xl font-black text-gray-900 dark:text-white tracking-tight mb-4">
             Your Photo Prompts Collection
           </h1>
         </div>
         
-        <p className="text-gray-600 text-base md:text-lg max-w-3xl mx-auto leading-relaxed">
+        <p className="text-gray-600 dark:text-gray-300 text-base md:text-lg max-w-3xl mx-auto leading-relaxed">
           Discover curated prompts for <span className="font-semibold text-orange-500">Nano Banana</span> image generation and editing. 
           Transform your ideas into stunning visuals with our handpicked prompt library.
         </p>
