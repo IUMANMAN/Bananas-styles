@@ -76,7 +76,8 @@ export default function ShareModal({ isOpen, onClose, style }: ShareModalProps) 
   if (!isOpen || !mounted) return null
   
   // Use production domain for sharing
-  const shareDomain = process.env.NEXT_PUBLIC_APP_URL || 'https://pumpbanana.com'
+  // Use production domain for sharing
+  const shareDomain = process.env.NEXT_PUBLIC_APP_URL || 'https://www.pumpbanana.com'
   const shareUrl = `${shareDomain}/style/${style.slug || style.id}`
   const shareText = `Check out this prompt "${style.title}" on PUMPBANANA! `
 
@@ -135,12 +136,12 @@ export default function ShareModal({ isOpen, onClose, style }: ShareModalProps) 
     <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
       {/* Backdrop - Increased opacity */}
       <div 
-        className="absolute inset-0 bg-black/90 backdrop-blur-xl transition-opacity animate-in fade-in duration-200" 
+        className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity animate-in fade-in duration-200" 
         onClick={onClose}
       />
 
       {/* Modal Container */}
-      <div className="relative w-full max-w-5xl bg-white dark:bg-zinc-900 rounded-3xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200 flex flex-col md:flex-row max-h-[90vh]">
+      <div className="relative w-full max-w-5xl bg-white/95 dark:bg-zinc-900/95 backdrop-blur-xl rounded-3xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200 flex flex-col md:flex-row max-h-[90vh]">
         
         {/* LEFT: Preview Area */}
         <div className="flex-1 bg-gray-100 dark:bg-black/50 p-6 md:p-10 flex items-center justify-center overflow-y-auto min-h-[300px]">

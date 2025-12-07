@@ -64,6 +64,19 @@ export default function Footer() {
             </a>
           </div>
 
+          {/* Contact & Disclaimer */}
+          <div className="text-center space-y-2 max-w-lg mx-auto">
+            <a 
+              href="mailto:support@pumpbanana.com" 
+              className="text-orange-500 font-bold hover:underline transition-all"
+            >
+              support@pumpbanana.com
+            </a>
+            <p className="text-gray-400 text-xs leading-relaxed">
+              All prompts are public to inspire the community. AI-generated content is open for everyone to use and remix.
+            </p>
+          </div>
+
           {/* Copyright */}
           <div className="text-center text-gray-400 text-xs">
             &copy; {new Date().getFullYear()} PUMPBANANA. All rights reserved.
