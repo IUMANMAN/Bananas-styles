@@ -180,8 +180,10 @@ export async function createStyle(formData: FormData) {
                         if (keywordId) {
                             await supabase
                                 .from('style_keywords')
-                                .insert({ style_id: style.id, keyword_id: keywordId })
-                                .ignore() // ignore duplicates
+                                .upsert(
+                                    { style_id: style.id, keyword_id: keywordId },
+                                    { onConflict: 'style_id, keyword_id', ignoreDuplicates: true }
+                                )
                         }
                     }
                 }
