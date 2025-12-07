@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { createStyle } from '@/app/admin/actions'
 import { useRouter } from 'next/navigation'
 import { Loader2 } from 'lucide-react'
+import KeywordSelector from '@/components/KeywordSelector'
 
 export default function CreateStylePage() {
   const router = useRouter()
@@ -70,6 +71,8 @@ export default function CreateStylePage() {
           />
         </div>
 
+        <KeywordSelector />
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label className="block text-sm font-bold text-gray-700 mb-2">Generated Image</label>
@@ -77,19 +80,13 @@ export default function CreateStylePage() {
                <input 
                 type="file"
                 name="generated_image_file"
-                accept="image/*"
+                accept=".jpg,.jpeg,.png"
                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
               />
               <div className="pointer-events-none">
-                <p className="text-sm font-medium text-gray-500">Click to upload file</p>
-                <p className="text-xs text-gray-400 mt-1">or provide URL below</p>
+                <p className="text-sm font-medium text-gray-500">Click to upload (JPEG/PNG)</p>
               </div>
             </div>
-             <input 
-              name="generated_image_url" 
-              className="w-full mt-2 px-4 py-3 rounded-xl border border-gray-200 focus:border-[#330066] outline-none text-sm"
-              placeholder="Or paste URL..."
-            />
           </div>
 
           <div>
@@ -98,19 +95,13 @@ export default function CreateStylePage() {
                <input 
                 type="file"
                 name="original_image_file"
-                accept="image/*"
+                accept=".jpg,.jpeg,.png"
                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
               />
                <div className="pointer-events-none">
-                <p className="text-sm font-medium text-gray-500">Click to upload file</p>
-                <p className="text-xs text-gray-400 mt-1">or provide URL below</p>
+                <p className="text-sm font-medium text-gray-500">Click to upload (JPEG/PNG)</p>
               </div>
             </div>
-            <input 
-              name="original_image_url" 
-              className="w-full mt-2 px-4 py-3 rounded-xl border border-gray-200 focus:border-[#330066] outline-none text-sm"
-              placeholder="Or paste URL..."
-            />
           </div>
         </div>
 

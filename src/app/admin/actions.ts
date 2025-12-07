@@ -124,7 +124,7 @@ export async function createStyle(formData: FormData) {
         .replace(/-+/g, '-')          // Remove duplicate hyphens
         .trim()
 
-    const { error } = await supabase
+    const { data: style, error } = await supabase
         .from('styles')
         .insert({
             title,
@@ -135,10 +135,60 @@ export async function createStyle(formData: FormData) {
             original_image_url: original_image_url || null,
             slug,
         })
+        .select()
+        .single()
 
     if (error) {
         console.error('Error creating style:', error)
         return { success: false, error: error.message }
+    }
+
+    // Handle Keywords
+    const keywordsJson = formData.get('keywords') as string
+    if (keywordsJson) {
+        try {
+            const keywords = JSON.parse(keywordsJson) as string[]
+            if (keywords.length > 0) {
+                // Determine user ID (we know user exists from update above, but need id)
+                const { data: { user } } = await supabase.auth.getUser()
+                if (user) {
+                    for (const k of keywords) {
+                        const keywordText = k.trim().toLowerCase()
+                        if (!keywordText) continue
+
+                        // 1. Find or Create Keyword
+                        let keywordId: string | null = null
+
+                        const { data: existing } = await supabase
+                            .from('keywords')
+                            .select('id')
+                            .eq('keyword', keywordText)
+                            .single()
+
+                        if (existing) {
+                            keywordId = existing.id
+                        } else {
+                            const { data: newKeyword } = await supabase
+                                .from('keywords')
+                                .insert({ keyword: keywordText, created_by: user.id })
+                                .select('id')
+                                .single()
+                            if (newKeyword) keywordId = newKeyword.id
+                        }
+
+                        // 2. Link to Style
+                        if (keywordId) {
+                            await supabase
+                                .from('style_keywords')
+                                .insert({ style_id: style.id, keyword_id: keywordId })
+                                .ignore() // ignore duplicates
+                        }
+                    }
+                }
+            }
+        } catch (e) {
+            console.error('Error processing keywords:', e)
+        }
     }
 
     revalidatePath('/')
