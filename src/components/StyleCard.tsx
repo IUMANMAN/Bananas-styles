@@ -1,3 +1,5 @@
+'use client'
+
 import Image from 'next/image'
 import Link from 'next/link'
 import { Heart, Eye, Share2, Check, Copy, Trash2, Pencil } from 'lucide-react'
@@ -8,6 +10,7 @@ import { cn } from '@/lib/utils'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { deleteStyle } from '@/app/admin/actions'
+import { useLanguage } from '@/contexts/LanguageContext'
 
 interface Style {
   id: string
@@ -32,6 +35,10 @@ interface StyleCardProps {
   initialLiked?: boolean
   initialOpenedStyleId?: string
   slug?: string
+  source_url?: string
+  ch_title?: string
+  ch_prompt?: string
+  ch_introduction?: string
   ownerId?: string
   currentUserId?: string
   isAdmin?: boolean
@@ -47,10 +54,24 @@ export default function StyleCard({
   initialLiked = false, 
   initialOpenedStyleId, 
   slug,
+  source_url,
+  ch_title,
+  ch_prompt,
+  ch_introduction,
   ownerId,
   currentUserId,
   isAdmin
 }: StyleCardProps) {
+  const { t } = useLanguage()
+  const currentTitle = t(title, ch_title)
+  // Clean title numbering if strictly needed, but English/Chinese titles might differ in format.
+  // The original cleaner `title.replace(/^\d+\.\s*/, '')` handles "18. Title".
+  // Localized titles might not have numbering or might have it. Let's apply cleaning.
+  const displayTitle = currentTitle?.replace(/^\d+\.\s*/, '') || ''
+
+  const displayPrompt = t(prompt, ch_prompt) || ''
+  const displayIntroduction = t(introduction, ch_introduction)
+  
   const [liked, setLiked] = useState(initialLiked)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isShareModalOpen, setIsShareModalOpen] = useState(false)
@@ -99,7 +120,7 @@ export default function StyleCard({
   }, [id, initialOpenedStyleId, shareId])
 
   // Remove leading numbering
-  const displayTitle = title.replace(/^\d+\.\s*/, '')
+  // const displayTitle = title.replace(/^\d+\.\s*/, '')
 
   const toggleLike = async (e: React.MouseEvent) => {
     e.preventDefault()
@@ -127,7 +148,7 @@ export default function StyleCard({
   const handleCopyPrompt = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
-    navigator.clipboard.writeText(prompt || '')
+    navigator.clipboard.writeText(displayPrompt || '')
     setPromptCopied(true)
     setTimeout(() => setPromptCopied(false), 2000)
   }
@@ -151,11 +172,11 @@ export default function StyleCard({
           {/* ... Images ... */}
           <div className="flex w-full">
             {originalImageUrl && (
-              <div className="relative w-1/2 aspect-[3/4] overflow-hidden bg-gray-100 border-r border-white/20">
+              <div className="relative w-1/2 overflow-hidden bg-gray-100 border-r border-white/20">
                 <img
                   src={originalImageUrl}
                   alt={`Original - ${displayTitle}`}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-105"
                 />
                  <div className="absolute top-2 left-2 px-2 py-1 bg-black/40 backdrop-blur-md rounded-md text-[10px] font-bold text-white uppercase tracking-wider">
                   Ref
@@ -164,13 +185,13 @@ export default function StyleCard({
             )}
 
             <div className={cn(
-              "relative aspect-[3/4] overflow-hidden bg-gray-100",
+              "relative overflow-hidden bg-gray-100",
               originalImageUrl ? "w-1/2" : "w-full"
             )}>
               <img
                 src={imageUrl}
                 alt={displayTitle}
-                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-105"
               />
               <div className="absolute top-2 right-2 px-2 py-1 bg-black/40 backdrop-blur-md rounded-md text-[10px] font-bold text-white uppercase tracking-wider">
                 AI
@@ -179,7 +200,7 @@ export default function StyleCard({
           </div>
           
           {/* Card Footer */}
-          <div className="bg-white dark:bg-zinc-900 p-4 flex justify-between items-center gap-3">
+          <div className="bg-zinc-100/80 dark:bg-zinc-900 p-4 flex justify-between items-center gap-3 backdrop-blur-sm">
              <h3 className="font-bold text-black dark:text-gray-200 text-sm sm:text-base leading-tight line-clamp-2 flex-grow">
               {displayTitle}
             </h3>
@@ -247,10 +268,11 @@ export default function StyleCard({
         onClose={handleCloseModal} 
         style={{
           title: displayTitle,
-          introduction,
-          prompt: prompt || '',
+          introduction: displayIntroduction,
+          prompt: displayPrompt,
           imageUrl,
-          originalImageUrl
+          originalImageUrl,
+          source_url
         }}
       />
 
@@ -261,7 +283,7 @@ export default function StyleCard({
           id,
           slug: shareId,
           title: displayTitle,
-          prompt: prompt || '',
+          prompt: displayPrompt,
           imageUrl,
           originalImageUrl
         }}

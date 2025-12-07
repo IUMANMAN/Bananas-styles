@@ -16,6 +16,10 @@ interface Style {
   created_at: string
   slug?: string
   user_id?: string
+  source_url?: string
+  ch_title?: string
+  ch_prompt?: string
+  ch_introduction?: string
 }
 
 interface InfiniteMasonryGridProps {
@@ -99,6 +103,10 @@ export default function InfiniteMasonryGrid({ initialStyles, initialLikedIds, in
             initialOpenedStyleId={initialOpenedStyle?.id}
             slug={style.slug}
             ownerId={style.user_id}
+            source_url={style.source_url}
+            ch_title={style.ch_title}
+            ch_prompt={style.ch_prompt}
+            ch_introduction={style.ch_introduction}
             currentUserId={currentUserId}
             isAdmin={isAdmin}
           />

@@ -7,6 +7,7 @@ import { useState, useEffect } from 'react'
 import { cn } from '@/lib/utils'
 import HighlightedText from './HighlightedText'
 import { createClient } from '@/lib/supabase/client'
+import { useLanguage } from '@/contexts/LanguageContext'
 
 interface StyleModalProps {
   isOpen: boolean
@@ -22,6 +23,7 @@ interface StyleModalProps {
 }
 
 export default function StyleModal({ isOpen, onClose, style }: StyleModalProps) {
+  const { t } = useLanguage()
   const [copied, setCopied] = useState(false)
   const [keywords, setKeywords] = useState<string[]>([])
   const [mounted, setMounted] = useState(false)
@@ -33,7 +35,17 @@ export default function StyleModal({ isOpen, onClose, style }: StyleModalProps) 
 
   // ... fetchKeywords effect
 
-  // ... scroll lock effect
+  // Scroll lock effect
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = 'unset'
+    }
+    return () => {
+      document.body.style.overflow = 'unset'
+    }
+  }, [isOpen])
 
   const handleCopy = async () => {
     try {
@@ -113,7 +125,7 @@ export default function StyleModal({ isOpen, onClose, style }: StyleModalProps) 
               {style.introduction && (
                 <div className="mb-6">
                   <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2">
-                    Description
+                    {t('Description', '描述')}
                   </h3>
                   <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
                     {style.introduction}
@@ -124,23 +136,48 @@ export default function StyleModal({ isOpen, onClose, style }: StyleModalProps) 
               {style.source_url && (
                 <div className="mb-8">
                    <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2">
-                    Source
+                    {t('Author', '作者')}
                   </h3>
-                  <a 
-                    href={style.source_url} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="text-[#330066] dark:text-purple-300 hover:underline font-medium break-all"
-                  >
-                    {style.source_url}
-                  </a>
+                  {(() => {
+                    // Try to parse Markdown link [Text](URL)
+                    const markdownMatch = style.source_url.match(/\[(.*?)\]\((.*?)\)/);
+                    if (markdownMatch) {
+                      const [, text, url] = markdownMatch;
+                      return (
+                        <a 
+                          href={url} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-[#330066] dark:text-purple-300 hover:underline font-medium text-lg"
+                        >
+                          {text}
+                        </a>
+                      );
+                    }
+                    // Fallback to plain URL or text
+                    const isUrl = style.source_url.startsWith('http');
+                    return isUrl ? (
+                      <a 
+                        href={style.source_url} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-[#330066] dark:text-purple-300 hover:underline font-medium break-all"
+                      >
+                        {style.source_url}
+                      </a>
+                    ) : (
+                      <span className="text-gray-900 dark:text-gray-100 font-medium">
+                        {style.source_url}
+                      </span>
+                    );
+                  })()}
                 </div>
               )}
 
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider">
-                    Prompt
+                    {t('Prompt', '提示词')}
                   </h3>
                 <button
                   onClick={handleCopy}
@@ -154,12 +191,12 @@ export default function StyleModal({ isOpen, onClose, style }: StyleModalProps) 
                   {copied ? (
                     <>
                       <Check className="w-3.5 h-3.5" />
-                      Copied
+                      {t('Copied', '已复制')}
                     </>
                   ) : (
                     <>
                       <Copy className="w-3.5 h-3.5" />
-                      Copy
+                      {t('Copy', '复制')}
                     </>
                   )}
                 </button>
@@ -179,7 +216,7 @@ export default function StyleModal({ isOpen, onClose, style }: StyleModalProps) 
               onClick={onClose}
               className="w-full py-3 px-4 bg-black dark:bg-white text-white dark:text-black rounded-xl font-medium hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors shadow-lg hover:shadow-xl transform active:scale-[0.98] duration-200"
             >
-              Close Details
+              {t('Close Details', '关闭详情')}
             </button>
           </div>
         </div>

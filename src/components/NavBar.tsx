@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import AuthButton from './AuthButton'
+import LanguageToggle from './LanguageToggle'
 
 import { createClient } from '@/lib/supabase/server'
 
@@ -44,6 +45,9 @@ export default async function NavBar() {
                 My Likes
               </Link>
             )}
+            <div className="ml-2">
+              <LanguageToggle />
+            </div>
             <div className="ml-2">
               <AuthButton />
             </div>

@@ -1,3 +1,5 @@
+'use client'
+
 import { createPortal } from 'react-dom'
 import { X, Copy, Check, Twitter, Facebook, Link as LinkIcon, Download } from 'lucide-react'
 import { useState, useEffect, useRef } from 'react'
