@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import AuthButton from './AuthButton'
 import LanguageToggle from './LanguageToggle'
+import NavLinks from './NavLinks'
 
 import { createClient } from '@/lib/supabase/server'
 
@@ -30,21 +31,7 @@ export default async function NavBar() {
 
           {/* Right-aligned Navigation Items */}
           <div className="absolute right-0 flex items-center gap-4 sm:gap-6">
-            {isAdmin && (
-              <>
-                 <Link href="/admin/create" className="text-sm font-bold text-black dark:text-white hover:opacity-70 transition-opacity px-2 py-1">
-                  Create
-                </Link>
-                <Link href="/admin/keywords" className="text-sm font-bold text-black dark:text-white hover:opacity-70 transition-opacity px-2 py-1">
-                  Keywords
-                </Link>
-              </>
-            )}
-            {user && (
-              <Link href="/favorites" className="text-sm font-bold text-black dark:text-white hover:opacity-70 transition-opacity px-2 py-1">
-                My Likes
-              </Link>
-            )}
+            <NavLinks isAdmin={isAdmin} isLoggedIn={!!user} />
             <div className="ml-2">
               <LanguageToggle />
             </div>
