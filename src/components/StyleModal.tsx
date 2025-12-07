@@ -84,16 +84,16 @@ export default function StyleModal({ isOpen, onClose, style }: StyleModalProps) 
         
           {/* Images Section (Left/Top) */}
           {/* Images Section (Left/Top) */}
-          <div className="w-full md:w-3/5 bg-black flex flex-col md:flex-row h-1/2 md:h-full">
+          <div className="w-full md:w-3/5 bg-black flex flex-row flex-nowrap h-[35vh] md:h-full shrink-0">
             {/* Original Image */}
             {style.originalImageUrl && (
-              <div className="relative w-1/2 h-full flex items-center justify-center p-4 border-r border-white/10">
+              <div className="relative w-1/2 basis-1/2 h-full flex items-center justify-center p-2 md:p-4 border-r border-white/10 shrink-0">
                 <img
                   src={style.originalImageUrl}
                   alt={`Original - ${style.title}`}
                   className="max-w-full max-h-full object-contain"
                 />
-                <div className="absolute top-4 left-4 px-3 py-1.5 bg-blue-600/80 backdrop-blur-md rounded-lg text-xs font-semibold text-white uppercase tracking-wider shadow-sm z-20">
+                <div className="absolute top-2 left-2 md:top-4 md:left-4 px-2 py-1 md:px-3 md:py-1.5 bg-blue-600/80 backdrop-blur-md rounded-lg text-[10px] md:text-xs font-semibold text-white uppercase tracking-wider shadow-sm z-20">
                   Original
                 </div>
               </div>
@@ -101,15 +101,17 @@ export default function StyleModal({ isOpen, onClose, style }: StyleModalProps) 
 
             {/* Generated Image */}
             <div className={cn(
-              "relative h-full flex items-center justify-center p-4",
-              style.originalImageUrl ? "w-1/2" : "w-full"
+              "relative flex items-center justify-center p-2 md:p-4 shrink-0",
+              style.originalImageUrl 
+                ? "w-1/2 basis-1/2 h-full" 
+                : "w-full h-full"
             )}>
                <img
                 src={style.imageUrl}
                 alt={`Generated - ${style.title}`}
                 className="max-w-full max-h-full object-contain"
               />
-              <div className="absolute top-4 right-4 px-3 py-1.5 bg-black/60 backdrop-blur-md rounded-lg text-xs font-semibold text-white uppercase tracking-wider shadow-sm z-20">
+              <div className="absolute top-2 right-2 md:top-4 md:right-4 px-2 py-1 md:px-3 md:py-1.5 bg-black/60 backdrop-blur-md rounded-lg text-[10px] md:text-xs font-semibold text-white uppercase tracking-wider shadow-sm z-20">
                 Generated
               </div>
             </div>
